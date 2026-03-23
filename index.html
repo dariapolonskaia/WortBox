@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wortbox</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wortbox">
+<meta name="theme-color" content="#8b5cf6">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1a1f;
+    --bg2: #21212a;
+    --bg3: #2a2a35;
+    --bg4: #32323f;
+    --border: #3a3a4a;
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --text3: #5a5a72;
+    --accent: #8b5cf6;
+    --accent2: #7c3aed;
+    --accent-glow: rgba(139,92,246,0.25);
+    --accent-soft: rgba(139,92,246,0.12);
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 4px;
+  }
+
+  .nav-tab {
+    padding: 7px 18px;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .nav-tab.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .nav-tab:hover:not(.active) {
+    color: var(--text);
+    background: var(--bg3);
+  }
+
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+  }
+
+  .streak-badge .fire { font-size: 15px; }
+
+  /* SCREENS */
+  .screen { display: none; padding: 32px 28px; max-width: 900px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  /* ─── LEARN SCREEN ─── */
+  .session-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .session-info h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .session-info p {
+    color: var(--text2);
+    font-size: 14px;
+    margin-top: 3px;
+  }
+
+  .progress-wrap {
+    width: 180px;
+  }
+
+  .progress-numbers {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .progress-bar {
+    height: 5px;
+    background: var(--bg3);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  /* CARD */
+  .card-area {
+    perspective: 1200px;
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto 32px;
+  }
+
+  .card-scene {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+  }
+
+  .card-scene.flipped { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 22px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px;
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+  }
+
+  .card-face.front {
+    background: linear-gradient(145deg, var(--bg2) 0%, #25253200 100%), var(--bg2);
+  }
+
+  .card-face.front::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px; right: -1px; bottom: -1px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, var(--accent) 0%, transparent 60%);
+    opacity: 0.2;
+    z-index: -1;
+  }
+
+  .card-face.back {
+    transform: rotateY(180deg);
+    background: linear-gradient(145deg, #23202f 0%, var(--bg2) 100%);
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+    opacity: 0.8;
+  }
+
+  .card-article {
+    font-size: 15px;
+    color: var(--text2);
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+
+  .card-word {
+    font-family: 'DM Serif Display', serif;
+    font-size: 48px;
+    color: var(--text);
+    letter-spacing: -1px;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .card-hint {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text3);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .card-translation {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .card-examples {
+    margin-top: 12px;
+    width: 100%;
+  }
+
+  .card-example {
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.55;
+    padding: 8px 12px;
+    background: var(--bg3);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    border-left: 2px solid var(--accent);
+  }
+
+  .card-example em {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  /* VERDICT BUTTONS */
+  .verdict-buttons {
+    display: flex;
+    gap: 12px;
+    max-width: 540px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: all 0.3s ease 0.1s;
+    pointer-events: none;
+  }
+
+  .verdict-buttons.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .verdict-btn {
+    flex: 1;
+    padding: 14px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg2);
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .verdict-btn .icon { font-size: 20px; }
+
+  .verdict-btn.bad:hover { background: rgba(248,113,113,0.15); border-color: var(--red); color: var(--red); }
+  .verdict-btn.medium:hover { background: rgba(251,191,36,0.12); border-color: var(--yellow); color: var(--yellow); }
+  .verdict-btn.good:hover { background: rgba(52,211,153,0.12); border-color: var(--green); color: var(--green); }
+
+  /* ─── ADD SCREEN ─── */
+  .add-header {
+    margin-bottom: 28px;
+  }
+
+  .add-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+  }
+
+  .add-header p { color: var(--text2); font-size: 14px; margin-top: 4px; }
+
+  .add-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .add-tab {
+    padding: 9px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .add-tab.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .add-tab:hover:not(.active) { background: var(--bg2); color: var(--text); }
+
+  .add-panel { display: none; }
+  .add-panel.active { display: block; }
+
+  .input-group { margin-bottom: 16px; }
+
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .input-field {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .input-field::placeholder { color: var(--text3); }
+
+  .input-field.german-input {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -0.3px;
+  }
+
+  .translation-result {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    min-height: 50px;
+    transition: all 0.3s;
+  }
+
+  .translation-result.loading { border-color: var(--accent); }
+
+  .translation-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .translation-placeholder { color: var(--text3); font-size: 14px; font-family: 'DM Sans', sans-serif; }
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .spinner.active { display: block; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .tag-select {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag-chip {
+    padding: 6px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tag-chip.selected {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tag-chip:hover:not(.selected) { background: var(--bg3); color: var(--text); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 6px 28px var(--accent-glow); }
+  .btn-primary:active { transform: translateY(0); }
+
+  textarea.input-field {
+    resize: vertical;
+    min-height: 110px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Photo upload area */
+  .photo-drop {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg2);
+  }
+
+  .photo-drop:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .photo-drop .icon-big { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+  .photo-drop p { color: var(--text2); font-size: 14px; }
+  .photo-drop p strong { color: var(--accent); }
+
+  /* ─── STATS SCREEN ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 20px;
+  }
+
+  .stat-card .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 38px;
+    color: var(--text);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .stat-card .stat-label {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+  }
+
+  .stat-card .stat-sub {
+    font-size: 12px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+
+  .stat-card.accent-card {
+    background: linear-gradient(135deg, var(--accent2) 0%, var(--accent) 100%);
+    border-color: transparent;
+  }
+
+  .stat-card.accent-card .stat-value,
+  .stat-card.accent-card .stat-label,
+  .stat-card.accent-card .stat-sub { color: white; opacity: 1; }
+  .stat-card.accent-card .stat-label { opacity: 0.75; }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    margin-bottom: 16px;
+    letter-spacing: -0.3px;
+  }
+
+  /* Activity grid */
+  .activity-grid {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .activity-day {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: var(--bg3);
+    transition: background 0.2s;
+  }
+
+  .activity-day.l1 { background: #4c2d8a; }
+  .activity-day.l2 { background: #6d3fc5; }
+  .activity-day.l3 { background: #8b5cf6; }
+  .activity-day.l4 { background: #a78bfa; box-shadow: 0 0 6px rgba(167,139,250,0.4); }
+
+  /* Word list */
+  .word-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .word-row {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    gap: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .word-row:hover { border-color: var(--accent); }
+
+  .word-de {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .word-ru {
+    font-size: 14px;
+    color: var(--text2);
+    flex: 1;
+  }
+
+  .word-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--bg4);
+  }
+
+  .word-status.learning { background: var(--yellow); }
+  .word-status.known { background: var(--green); }
+  .word-status.new { background: var(--text3); }
+
+  .word-tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-size: 14px;
+    color: var(--text);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    white-space: nowrap;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    nav { padding: 14px 18px; }
+    .screen { padding: 24px 18px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .card-word { font-size: 36px; }
+    .card-translation { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Wort<span>box</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showScreen(event,'learn')">Учить</button>
+    <button class="nav-tab" onclick="showScreen(event,'add')">Добавить</button>
+    <button class="nav-tab" onclick="showScreen(event,'stats')">Прогресс</button>
+  </div>
+  <div class="streak-badge"><span class="fire">🔥</span> 7 дней</div>
+</nav>
+
+<!-- ─── LEARN ─── -->
+<div id="screen-learn" class="screen active">
+  <div class="session-header">
+    <div class="session-info">
+      <h2>Сегодня</h2>
+      <p>Повторение · 12 карточек</p>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-numbers">
+        <span id="prog-current">4 из 12</span>
+        <span id="prog-pct">33%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width: 33%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-area">
+    <div class="card-scene" id="card" onclick="flipCard()">
+      <div class="card-face front">
+        <div class="card-label">Немецкий</div>
+        <div class="card-article" id="card-article">der</div>
+        <div class="card-word" id="card-word">Schlüssel</div>
+        <div class="card-hint">👆 нажми чтобы перевернуть</div>
+      </div>
+      <div class="card-face back">
+        <div class="card-label">Русский</div>
+        <div class="card-translation" id="card-translation">ключ</div>
+        <div class="card-examples" id="card-examples">
+          <div class="card-example">Ich habe meinen <em>Schlüssel</em> verloren. — Я потерял свой <em>ключ</em>.</div>
+          <div class="card-example">Der <em>Schlüssel</em> liegt auf dem Tisch. — <em>Ключ</em> лежит на столе.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="verdict-buttons" id="verdict-btns">
+    <button class="verdict-btn bad" onclick="verdict('bad')">
+      <span class="icon">✕</span>
+      Не знал
+    </button>
+    <button class="verdict-btn medium" onclick="verdict('medium')">
+      <span class="icon">〰</span>
+      С трудом
+    </button>
+    <button class="verdict-btn good" onclick="verdict('good')">
+      <span class="icon">✓</span>
+      Знал
+    </button>
+  </div>
+</div>
+
+<!-- ─── ADD ─── -->
+<div id="screen-add" class="screen">
+  <div class="add-header">
+    <h2>Добавить слова</h2>
+    <p>Пиши по-немецки — перевод найдём сами</p>
+  </div>
+
+  <div class="add-tabs">
+    <button class="add-tab active" onclick="switchAddTab(event,'single')">✏️ Одно слово</button>
+    <button class="add-tab" onclick="switchAddTab(event,'bulk')">📋 Список</button>
+    <button class="add-tab" onclick="switchAddTab(event,'photo')">📷 Фото</button>
+  </div>
+
+  <!-- SINGLE -->
+  <div class="add-panel active" id="panel-single">
+    <div class="input-group">
+      <label>Немецкое слово</label>
+      <input class="input-field german-input" id="de-input" placeholder="z.B. Schlüssel" oninput="onDeInput(this.value)">
+    </div>
+    <div class="input-group">
+      <label>Перевод <span style="color:var(--accent);font-size:11px;text-transform:none;letter-spacing:0">(автоматически)</span></label>
+      <div class="translation-result" id="translation-box">
+        <div class="spinner" id="spinner"></div>
+        <span class="translation-placeholder" id="trans-placeholder">Введи слово выше →</span>
+        <span class="translation-text" id="trans-text" style="display:none"></span>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>Тема</label>
+      <div class="tag-select">
+        <button class="tag-chip selected" onclick="toggleTag(this)">Разное</button>
+        <button class="tag-chip" onclick="toggleTag(this)">Работа</button>
+        <button class="tag-chip" onclick="toggleTag(this)">Еда</button>
+        <button class="tag-chip" onclick="toggleTag(this)">Природа</button>
+        <button class="tag-chip" onclick="toggleTag(this)">+ новая</button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="addWord()">Добавить карточку</button>
+  </div>
+
+  <!-- BULK -->
+  <div class="add-panel" id="panel-bulk">
+    <div class="input-group">
+      <label>Список слов (каждое с новой строки)</label>
+      <textarea class="input-field" placeholder="Hund&#10;Katze&#10;Baum&#10;Fenster&#10;Schlüssel"></textarea>
+    </div>
+    <div class="input-group">
+      <label>Тема</label>
+      <div class="tag-select">
+        <button class="tag-chip selected" onclick="toggleTag(this)">Разное</button>
+        <button class="tag-chip" onclick="toggleTag(this)">Работа</button>
+        <button class="tag-chip" onclick="toggleTag(this)">Еда</button>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="showToast('⚡ Переводим 5 слов...')">Перевести и добавить</button>
+  </div>
+
+  <!-- PHOTO -->
+  <div class="add-panel" id="panel-photo">
+    <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
+    <div class="photo-drop" id="photo-drop" onclick="document.getElementById('photo-input').click()"
+      ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+      ondragleave="this.style.borderColor=''"
+      ondrop="event.preventDefault();handlePhotoDrop(event)">
+      <div class="icon-big">🖼️</div>
+      <p><strong>Нажми чтобы загрузить фото</strong></p>
+      <p style="margin-top:6px;font-size:12px;color:var(--text3)">Или перетащи сюда · скриншот, фото книги, словарь</p>
+    </div>
+    <div id="photo-preview-wrap" style="display:none;margin-top:16px">
+      <img id="photo-preview" style="width:100%;border-radius:var(--radius);border:1px solid var(--border);max-height:260px;object-fit:cover">
+      <button class="btn-primary" id="scan-btn" style="margin-top:12px" onclick="scanPhoto()">🔍 Найти немецкие слова</button>
+    </div>
+    <div id="photo-results" style="display:none;margin-top:20px">
+      <div style="font-size:12px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Найденные слова — выбери нужные</div>
+      <div id="found-words-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn-primary" id="add-selected-btn" style="margin-top:16px;display:none" onclick="addSelectedWords()">Добавить выбранные карточки</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── STATS ─── -->
+<div id="screen-stats" class="screen">
+  <div class="stats-grid">
+    <div class="stat-card accent-card">
+      <div class="stat-value">🔥 7</div>
+      <div class="stat-label">Дней подряд</div>
+      <div class="stat-sub">Рекорд: 14 дней</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">142</div>
+      <div class="stat-label">Всего слов</div>
+      <div class="stat-sub">+8 на этой неделе</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">89</div>
+      <div class="stat-label">Выучено</div>
+      <div class="stat-sub">63% от всех</div>
+    </div>
+  </div>
+
+  <div class="section-title">Активность за 30 дней</div>
+  <div class="activity-grid" id="activity-grid"></div>
+
+  <div class="section-title" style="margin-top:28px">Слова</div>
+  <div class="word-list">
+    <div class="word-row">
+      <div class="word-status known"></div>
+      <div class="word-de">der Schlüssel</div>
+      <div class="word-ru">ключ</div>
+      <div class="word-tag">Разное</div>
+    </div>
+    <div class="word-row">
+      <div class="word-status learning"></div>
+      <div class="word-de">die Sehnsucht</div>
+      <div class="word-ru">тоска, томление</div>
+      <div class="word-tag">Разное</div>
+    </div>
+    <div class="word-row">
+      <div class="word-status new"></div>
+      <div class="word-de">das Fenster</div>
+      <div class="word-ru">окно</div>
+      <div class="word-tag">Дом</div>
+    </div>
+    <div class="word-row">
+      <div class="word-status known"></div>
+      <div class="word-de">der Hund</div>
+      <div class="word-ru">собака</div>
+      <div class="word-tag">Природа</div>
+    </div>
+    <div class="word-row">
+      <div class="word-status learning"></div>
+      <div class="word-de">die Katze</div>
+      <div class="word-ru">кошка</div>
+      <div class="word-tag">Природа</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── NAV ──
+function showScreen(e, name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  e.target.classList.add('active');
+}
+
+// ── CARD ──
+let isFlipped = false;
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('card').classList.toggle('flipped', isFlipped);
+  document.getElementById('verdict-btns').classList.toggle('visible', isFlipped);
+}
+
+const cards = [
+  { article: 'der', de: 'Schlüssel', ru: 'ключ', ex1: 'Ich habe meinen <em>Schlüssel</em> verloren.', ex1r: 'Я потерял свой <em>ключ</em>.', ex2: 'Der <em>Schlüssel</em> liegt auf dem Tisch.', ex2r: '<em>Ключ</em> лежит на столе.' },
+  { article: 'die', de: 'Sehnsucht', ru: 'тоска, томление', ex1: '<em>Sehnsucht</em> nach der Heimat.', ex1r: '<em>Тоска</em> по родине.', ex2: 'Er fühlte eine tiefe <em>Sehnsucht</em>.', ex2r: 'Он чувствовал глубокую <em>тоску</em>.' },
+  { article: 'das', de: 'Fenster', ru: 'окно', ex1: 'Mach bitte das <em>Fenster</em> auf.', ex1r: 'Открой, пожалуйста, <em>окно</em>.', ex2: 'Ich schaue aus dem <em>Fenster</em>.', ex2r: 'Я смотрю в <em>окно</em>.' },
+  { article: 'der', de: 'Hund', ru: 'собака', ex1: 'Mein <em>Hund</em> heißt Max.', ex1r: 'Мою <em>собаку</em> зовут Макс.', ex2: 'Der <em>Hund</em> bellt laut.', ex2r: '<em>Собака</em> громко лает.' },
+];
+
+let cardIndex = 0;
+function loadCard(i) {
+  const c = cards[i % cards.length];
+  document.getElementById('card-article').textContent = c.article;
+  document.getElementById('card-word').textContent = c.de;
+  document.getElementById('card-translation').textContent = c.ru;
+  document.getElementById('card-examples').innerHTML =
+    `<div class="card-example">${c.ex1} — ${c.ex1r}</div><div class="card-example">${c.ex2} — ${c.ex2r}</div>`;
+}
+
+function verdict(type) {
+  const msgs = { bad: '🔄 Повторим скоро', medium: '📅 Через пару дней', good: '✅ Отлично! Через неделю' };
+  showToast(msgs[type]);
+
+  const card = document.getElementById('card');
+  card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+  card.style.transform = 'scale(0.9)';
+  card.style.opacity = '0';
+
+  setTimeout(() => {
+    isFlipped = false;
+    card.classList.remove('flipped');
+    document.getElementById('verdict-btns').classList.remove('visible');
+    cardIndex++;
+    loadCard(cardIndex);
+    card.style.transition = 'none';
+    card.style.transform = 'scale(1.02)';
+    card.style.opacity = '1';
+    setTimeout(() => {
+      card.style.transition = 'transform 0.2s ease';
+      card.style.transform = 'scale(1)';
+      updateProgress();
+    }, 50);
+  }, 280);
+}
+
+function updateProgress() {
+  const total = 12;
+  const done = (cardIndex % total) + 4;
+  const pct = Math.min(Math.round((done / total) * 100), 100);
+  document.getElementById('prog-current').textContent = `${done} из ${total}`;
+  document.getElementById('prog-pct').textContent = `${pct}%`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── ADD ──
+let debounceTimer;
+function switchAddTab(e, tab) {
+  document.querySelectorAll('.add-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.add-panel').forEach(p => p.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function toggleTag(el) {
+  el.classList.toggle('selected');
+}
+
+function onDeInput(val) {
+  clearTimeout(debounceTimer);
+  const box = document.getElementById('translation-box');
+  const spinner = document.getElementById('spinner');
+  const placeholder = document.getElementById('trans-placeholder');
+  const transText = document.getElementById('trans-text');
+
+  if (!val.trim()) {
+    box.classList.remove('loading');
+    spinner.classList.remove('active');
+    placeholder.style.display = 'block';
+    placeholder.textContent = 'Введи слово выше →';
+    transText.style.display = 'none';
+    return;
+  }
+
+  box.classList.add('loading');
+  spinner.classList.add('active');
+  placeholder.style.display = 'none';
+  transText.style.display = 'none';
+
+  debounceTimer = setTimeout(async () => {
+    try {
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `Переведи немецкое слово или фразу на русский язык: "${val.trim()}"
+Ответь ТОЛЬКО валидным JSON без markdown и backticks:
+{"translation": "перевод", "article": "der/die/das или пусто", "examples": [{"de": "пример на немецком", "ru": "перевод примера"}, {"de": "второй пример", "ru": "перевод"}]}`
+        })
+      });
+      const data = await response.json();
+      const raw = data.text || '{}';
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const result = JSON.parse(clean);
+
+      spinner.classList.remove('active');
+      box.classList.remove('loading');
+      transText.textContent = result.translation || '—';
+      transText.style.display = 'block';
+
+      // store examples for addWord
+      box.dataset.article = result.article || '';
+      box.dataset.ex1de = result.examples?.[0]?.de || '';
+      box.dataset.ex1ru = result.examples?.[0]?.ru || '';
+      box.dataset.ex2de = result.examples?.[1]?.de || '';
+      box.dataset.ex2ru = result.examples?.[1]?.ru || '';
+    } catch(e) {
+      spinner.classList.remove('active');
+      box.classList.remove('loading');
+      placeholder.textContent = 'Ошибка — попробуй ещё раз';
+      placeholder.style.display = 'block';
+    }
+  }, 700);
+}
+
+function addWord() {
+  const val = document.getElementById('de-input').value.trim();
+  const trans = document.getElementById('trans-text').textContent;
+  if (!val) { showToast('Введи немецкое слово'); return; }
+  if (!trans) { showToast('Подождём перевод...'); return; }
+  showToast('✅ Карточка добавлена!');
+  document.getElementById('de-input').value = '';
+  document.getElementById('trans-text').style.display = 'none';
+  document.getElementById('trans-placeholder').style.display = 'block';
+  document.getElementById('trans-placeholder').textContent = 'Введи слово выше →';
+}
+
+// ── PHOTO ──
+let photoBase64 = null;
+
+function handlePhotoUpload(input) {
+  if (!input.files || !input.files[0]) return;
+  showPhotoPreview(input.files[0]);
+}
+function handlePhotoDrop(event) {
+  const file = event.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) showPhotoPreview(file);
+}
+function showPhotoPreview(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoBase64 = e.target.result.split(',')[1];
+    document.getElementById('photo-preview').src = e.target.result;
+    document.getElementById('photo-preview-wrap').style.display = 'block';
+    document.getElementById('photo-drop').style.display = 'none';
+    document.getElementById('photo-results').style.display = 'none';
+    document.getElementById('found-words-list').innerHTML = '';
+    document.getElementById('add-selected-btn').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function scanPhoto() {
+  if (!photoBase64) return;
+  const btn = document.getElementById('scan-btn');
+  btn.textContent = '⏳ Анализируем...';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch('/api/gemini', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageBase64: photoBase64,
+        prompt: `Найди все немецкие слова на этом изображении. Для каждого слова дай перевод на русский язык.
+Ответь ТОЛЬКО валидным JSON массивом, без каких-либо пояснений, без markdown, без backticks.
+Формат: [{"de": "der Hund", "ru": "собака"}, ...]
+Если немецких слов нет — верни пустой массив: []`
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.text || '[]';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const words = JSON.parse(clean);
+
+    const list = document.getElementById('found-words-list');
+    list.innerHTML = '';
+
+    if (!words.length) {
+      list.innerHTML = '<div style="color:var(--text2);font-size:14px;padding:12px 0">Немецких слов не найдено на фото</div>';
+    } else {
+      words.forEach((w, i) => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color 0.2s';
+        row.innerHTML = `
+          <input type="checkbox" id="w${i}" checked style="accent-color:var(--accent);width:16px;height:16px;cursor:pointer">
+          <label for="w${i}" style="flex:1;cursor:pointer;display:flex;gap:16px;align-items:center">
+            <span style="font-family:'DM Serif Display',serif;font-size:17px;color:var(--text);flex:1">${w.de}</span>
+            <span style="font-size:13px;color:var(--text2);flex:1">${w.ru}</span>
+          </label>`;
+        row.querySelector('input').addEventListener('change', updateAddBtn);
+        list.appendChild(row);
+      });
+      document.getElementById('add-selected-btn').style.display = 'block';
+    }
+
+    document.getElementById('photo-results').style.display = 'block';
+  } catch (e) {
+    showToast('❌ Ошибка — попробуй ещё раз');
+  }
+
+  btn.textContent = '🔍 Найти немецкие слова';
+  btn.disabled = false;
+}
+
+function updateAddBtn() {
+  const any = [...document.querySelectorAll('#found-words-list input[type=checkbox]')].some(c => c.checked);
+  document.getElementById('add-selected-btn').style.display = any ? 'block' : 'none';
+}
+
+function addSelectedWords() {
+  const checkboxes = [...document.querySelectorAll('#found-words-list input[type=checkbox]')];
+  const count = checkboxes.filter(c => c.checked).length;
+  if (!count) return;
+  showToast(`✅ Добавлено ${count} карточек!`);
+  document.getElementById('photo-results').style.display = 'none';
+  document.getElementById('photo-preview-wrap').style.display = 'none';
+  document.getElementById('photo-drop').style.display = 'block';
+  photoBase64 = null;
+  document.getElementById('photo-input').value = '';
+}
+
+// ── ACTIVITY ──
+function buildActivity() {
+  const grid = document.getElementById('activity-grid');
+  const levels = ['', 'l1', 'l2', 'l3', 'l4'];
+  const pattern = [0,0,1,2,1,0,0,1,2,3,2,1,0,0,2,3,4,3,2,1,0,1,2,3,2,3,4,3,2,1];
+  for (let i = 0; i < 56; i++) {
+    const d = document.createElement('div');
+    d.className = 'activity-day ' + (levels[pattern[i % pattern.length]] || '');
+    grid.appendChild(d);
+  }
+}
+
+buildActivity();
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+</script>
+</body>
+</html>
