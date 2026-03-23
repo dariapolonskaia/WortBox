@@ -677,9 +677,9 @@
 <nav>
   <div class="logo">Wort<span>box</span></div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showScreen('learn')">Учить</button>
-    <button class="nav-tab" onclick="showScreen('add')">Добавить</button>
-    <button class="nav-tab" onclick="showScreen('stats')">Прогресс</button>
+    <button class="nav-tab active" onclick="showScreen(event,'learn')">Учить</button>
+    <button class="nav-tab" onclick="showScreen(event,'add')">Добавить</button>
+    <button class="nav-tab" onclick="showScreen(event,'stats')">Прогресс</button>
   </div>
   <div class="streak-badge"><span class="fire">🔥</span> 7 дней</div>
 </nav>
@@ -745,9 +745,9 @@
   </div>
 
   <div class="add-tabs">
-    <button class="add-tab active" onclick="switchAddTab('single')">✏️ Одно слово</button>
-    <button class="add-tab" onclick="switchAddTab('bulk')">📋 Список</button>
-    <button class="add-tab" onclick="switchAddTab('photo')">📷 Фото</button>
+    <button class="add-tab active" onclick="switchAddTab(event,'single')">✏️ Одно слово</button>
+    <button class="add-tab" onclick="switchAddTab(event,'bulk')">📋 Список</button>
+    <button class="add-tab" onclick="switchAddTab(event,'photo')">📷 Фото</button>
   </div>
 
   <!-- SINGLE -->
@@ -879,11 +879,11 @@
 
 <script>
 // ── NAV ──
-function showScreen(name) {
+function showScreen(e, name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  event.target.classList.add('active');
+  e.target.classList.add('active');
 }
 
 // ── CARD ──
@@ -948,10 +948,10 @@ function updateProgress() {
 
 // ── ADD ──
 let debounceTimer;
-function switchAddTab(tab) {
+function switchAddTab(e, tab) {
   document.querySelectorAll('.add-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.add-panel').forEach(p => p.classList.remove('active'));
-  event.target.classList.add('active');
+  e.target.classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
 }
 
